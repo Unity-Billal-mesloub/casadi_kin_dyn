@@ -92,6 +92,9 @@ PYBIND11_MODULE(CASADI_KIN_DYN_MODULE, m) {
             .def("urdf", &CasadiKinDyn::urdf)
             .def("velocityLimits", &CasadiKinDyn::velocityLimits)
             .def("effortLimits", &CasadiKinDyn::effortLimits)
+            .def("getVNames", &CasadiKinDyn::getVNames)
+            .def("getVIndex", &CasadiKinDyn::getVIndex)
+            .def("getVIndexFromVName", &CasadiKinDyn::getVIndexFromVName)
             ;
 
     py::enum_<CasadiKinDyn::ReferenceFrame>(casadikindyn, "ReferenceFrame")

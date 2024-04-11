@@ -19,6 +19,8 @@
 
 #include <urdf_parser/urdf_parser.h>
 
+#include <xbot2_interface/xbotinterface2.h>
+
 
 
 namespace casadi_kin_dyn
@@ -93,6 +95,10 @@ public:
 
     std::string urdf;
 
+    const std::vector<std::string>& getVNames() const;
+    int getVIndex(const std::string& joint_name) const;
+    int getVIndexFromVName(const std::string& v_name) const;
+
 
 private:
 
@@ -108,8 +114,24 @@ private:
     casadi::SX _q, _qdot, _qddot, _tau;
     std::vector<double> _q_min, _q_max;
     urdf::ModelInterfaceSharedPtr _urdf;
+    XBot::ModelInterface::Ptr _model_xbot;
 
 };
+
+const std::vector<std::string>& CasadiKinDyn::Impl::getVNames() const
+{
+    return _model_xbot->getVNames();
+}
+
+int CasadiKinDyn::Impl::getVIndex(const std::string& joint_name) const
+{
+    return _model_xbot->getVIndex(joint_name);
+}
+
+int CasadiKinDyn::Impl::getVIndexFromVName(const std::string& v_name) const
+{
+    return _model_xbot->getVIndexFromVName(v_name);
+}
 
 CasadiKinDyn::Impl::Impl(urdf::ModelInterfaceSharedPtr urdf_model,
                          bool verbose,
@@ -170,6 +192,9 @@ CasadiKinDyn::Impl::Impl(urdf::ModelInterfaceSharedPtr urdf_model,
     for(unsigned int i = 0; i < _model_dbl.upperPositionLimit.size(); ++i)
         _q_max[i] = _model_dbl.upperPositionLimit[i];
 
+
+    //create _model_xbot
+    _model_xbot = XBot::ModelInterface::getModel(std::static_pointer_cast<urdf::Model>(urdf_model), NULL, "pin");
 }
 
 double CasadiKinDyn::Impl::mass() const
@@ -813,6 +838,21 @@ CasadiKinDyn::CasadiKinDyn(std::string urdf_string,
 CasadiKinDyn::CasadiKinDyn(const CasadiKinDyn &other)
 {
     _impl = std::make_unique<Impl>(*other._impl);
+}
+
+const std::vector<std::string>& CasadiKinDyn::getVNames() const
+{
+    return impl().getVNames();
+}
+
+int CasadiKinDyn::getVIndex(const std::string& joint_name) const
+{
+    return impl().getVIndex(joint_name);
+}
+
+int CasadiKinDyn::getVIndexFromVName(const std::string& v_name) const
+{
+    return  impl().getVIndexFromVName(v_name);
 }
 
 int CasadiKinDyn::nq() const

@@ -100,6 +100,10 @@ public:
 
     std::any modelHandle() const;
 
+    const std::vector<std::string>& getVNames() const;
+    int getVIndex(const std::string& joint_name) const;
+    int getVIndexFromVName(const std::string& v_name) const;
+
     ~CasadiKinDyn();
 
 private:
@@ -108,7 +112,6 @@ private:
     std::unique_ptr<Impl> _impl;
     const Impl& impl() const;
     Impl& impl();
-
 };
 
 }

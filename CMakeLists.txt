@@ -10,6 +10,7 @@ find_package(casadi 3.5.5 REQUIRED)
 find_package(urdfdom REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(pinocchio REQUIRED)
+find_package(xbot2_interface REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -36,6 +37,7 @@ add_library(${LIBRARY_TARGET_NAME} SHARED
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     casadi
+    xbot2_interface::xbot2_interface
     ${PINOCCHIO_LIBRARIES}
     PRIVATE
     ${urdfdom_LIBRARIES}
