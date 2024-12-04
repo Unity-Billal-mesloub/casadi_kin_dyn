@@ -10,6 +10,7 @@ find_package(casadi 3.5.5 REQUIRED)
 find_package(urdfdom REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(pinocchio REQUIRED)
+find_package(hpp-fcl REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -19,8 +20,6 @@ include_directories(
     ${PINOCCHIO_INCLUDE_DIRS}
     src/
 )
-
-
 
 # Compile and install matlogger2 library
 set(LIBRARY_TARGET_NAME casadi_kin_dyn) # set library name
@@ -36,9 +35,10 @@ add_library(${LIBRARY_TARGET_NAME} SHARED
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
     casadi
-    ${PINOCCHIO_LIBRARIES}
+    pinocchio::pinocchio
+    hpp-fcl::hpp-fcl
     PRIVATE
-    ${urdfdom_LIBRARIES}
+    urdfdom::urdf_parser
     ${Boost_LIBRARIES})
 
 set_target_properties(${LIBRARY_TARGET_NAME} PROPERTIES
