@@ -35,7 +35,7 @@ add_library(${LIBRARY_TARGET_NAME} SHARED
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
-    casadi
+    casadi::casadi
     ${PINOCCHIO_LIBRARIES}
     PRIVATE
     ${urdfdom_LIBRARIES}
