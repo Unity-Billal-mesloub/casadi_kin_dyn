@@ -35,11 +35,16 @@ add_library(${LIBRARY_TARGET_NAME} SHARED
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
-    casadi::casadi
-    ${PINOCCHIO_LIBRARIES}
+    casadi
+    pinocchio::pinocchio
+    hpp-fcl::hpp-fcl
     PRIVATE
     ${urdfdom_LIBRARIES}
     ${Boost_LIBRARIES})
+
+if(TARGET urdfdom::urdfdom)
+	target_link_libraries(${LIBRARY_TARGET_NAME} PRIVATE urdfdom::urdfdom)
+endif()
 
 set_target_properties(${LIBRARY_TARGET_NAME} PROPERTIES
         VERSION ${${PROJECT_NAME}_VERSION})
