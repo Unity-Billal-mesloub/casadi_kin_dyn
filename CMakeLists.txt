@@ -35,7 +35,7 @@ add_library(${LIBRARY_TARGET_NAME} SHARED
 
 target_link_libraries(${LIBRARY_TARGET_NAME}
     PUBLIC
-    casadi
+    casadi::casadi
     pinocchio::pinocchio
     hpp-fcl::hpp-fcl
     PRIVATE
