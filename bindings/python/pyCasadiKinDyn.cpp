@@ -89,6 +89,8 @@ PYBIND11_MODULE(CASADI_KIN_DYN_MODULE, m) {
             .def("potentialEnergy",
                  make_deserialized(&CasadiKinDyn::potentialEnergy))
             .def("mass", &CasadiKinDyn::mass)
+            .def("gravity", &CasadiKinDyn::gravity)
+            .def("setGravity", &CasadiKinDyn::setGravity)
             .def("urdf", &CasadiKinDyn::urdf)
             .def("velocityLimits", &CasadiKinDyn::velocityLimits)
             .def("effortLimits", &CasadiKinDyn::effortLimits)

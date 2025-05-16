@@ -39,6 +39,9 @@ public:
     std::vector<double> q_max() const;
     std::vector<std::string> joint_names() const;
     double mass() const;
+    Eigen::Vector3d gravity() const;
+
+    void setGravity(const Eigen::Vector3d g);
 
     Eigen::VectorXd mapToQ(std::map<std::string, double> jmap);
 
@@ -181,6 +184,20 @@ double CasadiKinDyn::Impl::mass() const
 
     return double(M);
 
+}
+
+Eigen::Vector3d CasadiKinDyn::Impl::gravity() const
+{
+    return _model_dbl.gravity.linear();
+}
+
+void CasadiKinDyn::Impl::setGravity(const Eigen::Vector3d g)
+{
+    if (g.norm() < 9.80 || g.norm() > 9.82)
+    {
+        std::cout << "Setting gravity vector with norm != 9.81. Aren't you on planet Earth anymore?" << std::endl;
+    }
+    _model_dbl.gravity.linear() = g;
 }
 
 Eigen::VectorXd CasadiKinDyn::Impl::velocityLimits() const
@@ -961,6 +978,16 @@ std::vector<std::string> CasadiKinDyn::joint_names() const
 double CasadiKinDyn::mass() const
 {
     return impl().mass();
+}
+
+Eigen::Vector3d CasadiKinDyn::gravity() const
+{
+    return impl().gravity();
+}
+
+void CasadiKinDyn::setGravity(const Eigen::Vector3d g)
+{
+    return impl().setGravity(g);
 }
 
 std::string CasadiKinDyn::urdf() const

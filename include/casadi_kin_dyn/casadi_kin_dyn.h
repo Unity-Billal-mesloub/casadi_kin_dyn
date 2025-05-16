@@ -92,6 +92,10 @@ public:
 
     double mass() const;
 
+    Eigen::Vector3d gravity() const;
+
+    void setGravity(const Eigen::Vector3d g);
+
     std::string urdf() const;
 
     std::string parentLink(const std::string& jname) const;
