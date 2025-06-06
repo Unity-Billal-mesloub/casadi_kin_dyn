@@ -39,9 +39,6 @@ public:
     std::vector<double> q_max() const;
     std::vector<std::string> joint_names() const;
     double mass() const;
-    Eigen::Vector3d gravity() const;
-
-    void setGravity(const Eigen::Vector3d g);
 
     Eigen::VectorXd mapToQ(std::map<std::string, double> jmap);
 
@@ -57,7 +54,7 @@ public:
               Eigen::Ref<const Eigen::VectorXd> v,
               Eigen::Ref<Eigen::VectorXd> qdot);
 
-    casadi::Function rnea();
+    casadi::Function rnea(const bool sym_g = false);
 
     casadi::Function computeCentroidalDynamics();
 
@@ -108,7 +105,7 @@ private:
     static casadi::SX eigmat_to_cas(const MatrixXs& eig);
 
     pinocchio::Model _model_dbl;
-    casadi::SX _q, _qdot, _qddot, _tau;
+    casadi::SX _q, _qdot, _qddot, _tau, _g;
     std::vector<double> _q_min, _q_max;
     urdf::ModelInterfaceSharedPtr _urdf;
 
@@ -164,6 +161,7 @@ CasadiKinDyn::Impl::Impl(urdf::ModelInterfaceSharedPtr urdf_model,
     _qdot = casadi::SX::sym("v", _model_dbl.nv);
     _qddot = casadi::SX::sym("a", _model_dbl.nv);
     _tau = casadi::SX::sym("tau", _model_dbl.nv);
+    _g = casadi::SX::sym("g", 3);
 
     _q_min.resize(_model_dbl.lowerPositionLimit.size());
     for(unsigned int i = 0; i < _model_dbl.lowerPositionLimit.size(); ++i)
@@ -184,20 +182,6 @@ double CasadiKinDyn::Impl::mass() const
 
     return double(M);
 
-}
-
-Eigen::Vector3d CasadiKinDyn::Impl::gravity() const
-{
-    return _model_dbl.gravity.linear();
-}
-
-void CasadiKinDyn::Impl::setGravity(const Eigen::Vector3d g)
-{
-    if (g.norm() < 9.80 || g.norm() > 9.82)
-    {
-        std::cout << "Setting gravity vector with norm != 9.81. Aren't you on planet Earth anymore?" << std::endl;
-    }
-    _model_dbl.gravity.linear() = g;
 }
 
 Eigen::VectorXd CasadiKinDyn::Impl::velocityLimits() const
@@ -584,10 +568,20 @@ std::string CasadiKinDyn::Impl::childLink(const std::string &jname) const
     return _urdf->getJoint(jname)->child_link_name;
 }
 
-casadi::Function CasadiKinDyn::Impl::rnea()
+casadi::Function CasadiKinDyn::Impl::rnea(const bool sym_g)
 {
     auto model = _model_dbl.cast<Scalar>();
     pinocchio::DataTpl<Scalar> data(model);
+
+    std::vector<casadi::SX> args {_q, _qdot, _qddot};
+    std::vector<std::string> args_name {"q", "v", "a"};
+
+    if (sym_g)
+    {
+        model.gravity.linear() = cas_to_eig(_g);
+        args_name.push_back("g");
+        args.push_back(_g);
+    }
 
 
     pinocchio::rnea(model, data, cas_to_eig(_q), cas_to_eig(_qdot), cas_to_eig(_qddot));
@@ -595,8 +589,8 @@ casadi::Function CasadiKinDyn::Impl::rnea()
 
     auto tau = eig_to_cas(data.tau);
     casadi::Function ID("rnea",
-                        {_q, _qdot, _qddot}, {tau},
-                        {"q", "v", "a"}, {"tau"});
+                        args, {tau},
+                        args_name, {"tau"});
 
     return ID;
 }
@@ -884,9 +878,9 @@ void CasadiKinDyn::qdot(Eigen::Ref<const Eigen::VectorXd> q,
     return impl().qdot(q, v, qdot);
 }
 
-casadi::Function CasadiKinDyn::rnea()
+casadi::Function CasadiKinDyn::rnea(const bool sym_g)
 {
-    return impl().rnea();
+    return impl().rnea(sym_g);
 }
 
 casadi::Function CasadiKinDyn::computeCentroidalDynamics()
@@ -978,16 +972,6 @@ std::vector<std::string> CasadiKinDyn::joint_names() const
 double CasadiKinDyn::mass() const
 {
     return impl().mass();
-}
-
-Eigen::Vector3d CasadiKinDyn::gravity() const
-{
-    return impl().gravity();
-}
-
-void CasadiKinDyn::setGravity(const Eigen::Vector3d g)
-{
-    return impl().setGravity(g);
 }
 
 std::string CasadiKinDyn::urdf() const

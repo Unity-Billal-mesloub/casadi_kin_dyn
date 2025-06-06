@@ -57,7 +57,7 @@ public:
               Eigen::Ref<const Eigen::VectorXd> v,
               Eigen::Ref<Eigen::VectorXd> qdot);
 
-    casadi::Function rnea();
+    casadi::Function rnea(const bool sym_g);
 
     casadi::Function computeCentroidalDynamics();
 
@@ -91,10 +91,6 @@ public:
     std::vector<std::string> joint_names() const;
 
     double mass() const;
-
-    Eigen::Vector3d gravity() const;
-
-    void setGravity(const Eigen::Vector3d g);
 
     std::string urdf() const;
 

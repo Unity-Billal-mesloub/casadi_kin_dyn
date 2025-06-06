@@ -61,7 +61,7 @@ PYBIND11_MODULE(CASADI_KIN_DYN_MODULE, m) {
             .def("parentLink", &CasadiKinDyn::parentLink)
             .def("joint_names", &CasadiKinDyn::joint_names)
             .def("rnea",
-                 make_deserialized(&CasadiKinDyn::rnea))
+                 make_deserialized(&CasadiKinDyn::rnea), py::arg("sym_g") = false)
             .def("qdot",
                  make_deserialized(&CasadiKinDyn::qdot))
             .def("integrate",
@@ -89,8 +89,6 @@ PYBIND11_MODULE(CASADI_KIN_DYN_MODULE, m) {
             .def("potentialEnergy",
                  make_deserialized(&CasadiKinDyn::potentialEnergy))
             .def("mass", &CasadiKinDyn::mass)
-            .def("gravity", &CasadiKinDyn::gravity)
-            .def("setGravity", &CasadiKinDyn::setGravity)
             .def("urdf", &CasadiKinDyn::urdf)
             .def("velocityLimits", &CasadiKinDyn::velocityLimits)
             .def("effortLimits", &CasadiKinDyn::effortLimits)
