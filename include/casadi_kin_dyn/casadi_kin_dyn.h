@@ -90,6 +90,8 @@ public:
 
     std::vector<std::string> joint_names() const;
 
+    bool hasFrame(const std::string& frame_name) const; 
+
     double mass() const;
 
     std::string urdf() const;

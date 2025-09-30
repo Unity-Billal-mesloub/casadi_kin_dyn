@@ -83,6 +83,8 @@ public:
     Eigen::VectorXd velocityLimits() const;
     Eigen::VectorXd effortLimits() const;
 
+    bool hasFrame(const std::string& frame_name) const; 
+
     int joint_nq(const std::string& jname) const;
 
     int joint_iq(const std::string& jname) const;
@@ -763,6 +765,12 @@ casadi::Function CasadiKinDyn::Impl::jacobian(std::string link_name, ReferenceFr
 }
 
 
+bool CasadiKinDyn::Impl::hasFrame(const std::string& frame_name) const
+{
+    return _model_dbl.existFrame(frame_name);
+}
+
+
 casadi::Function CasadiKinDyn::Impl::crba()
 {
     auto model = _model_dbl.cast<Scalar>();
@@ -928,6 +936,10 @@ casadi::Function CasadiKinDyn::jacobian(std::string link_name, ReferenceFrame re
     return impl().jacobian(link_name, ref);
 }
 
+bool CasadiKinDyn::hasFrame(const std::string& frame_name) const
+{
+    return impl().hasFrame(frame_name);
+}
 
 CasadiKinDyn::~CasadiKinDyn()
 {
